@@ -1,13 +1,11 @@
 package com.example.bakerappudacitynd.network;
 
-import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("com.robohorse.robopojogenerator")
 public class IngredientsItem{
 
 	@SerializedName("quantity")
-	private int quantity;
+	private double quantity;
 
 	@SerializedName("measure")
 	private String measure;
@@ -15,11 +13,11 @@ public class IngredientsItem{
 	@SerializedName("ingredient")
 	private String ingredient;
 
-	public void setQuantity(int quantity){
+	public void setQuantity(double quantity){
 		this.quantity = quantity;
 	}
 
-	public int getQuantity(){
+	public double getQuantity(){
 		return quantity;
 	}
 

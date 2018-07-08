@@ -21,19 +21,20 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
     private MainView view;
     private List<Recipe> data;
 
-    public MainPresenter(MainView view) {
+    MainPresenter(MainView view) {
     this.view = view;
     }
 
     public void loadData() {
         view.onStartLoading();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://")
+                .baseUrl("https://d17h27t6h515a5.cloudfront.net")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RecipeService service = retrofit.create(RecipeService.class);
-        Call<List<Recipe>> call = null;
+        Call<List<Recipe>> call;
         call = service.getBakeRecipesJson();
+        Log.i(TAG, "Call URL: " + call.request().url().toString());
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
