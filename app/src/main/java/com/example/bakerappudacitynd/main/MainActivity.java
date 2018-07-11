@@ -79,7 +79,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onClick(Recipe recipe) {
-        Toast.makeText(this, "Recipe will be opened in next version", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
         intent.putExtra(Recipe.KEY_RECIPE_DATA, recipe);
         startActivity(intent);

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.bakerappudacitynd.R;
+import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
 import com.example.bakerappudacitynd.network.IngredientsItem;
 import com.example.bakerappudacitynd.network.StepsItem;
 
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecipeStepsFragment extends Fragment {
+public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.StepOnCLickListener{
 
     private List<StepsItem> stepsList;
     private RecyclerView stepsRecyclerView;
@@ -46,7 +47,7 @@ public class RecipeStepsFragment extends Fragment {
         }
         if (stepsList != null) {
             stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+            RecipeStepAdapter stepAdapter = new RecipeStepAdapter(stepsList, this);
         }
 
 
@@ -65,4 +66,8 @@ public class RecipeStepsFragment extends Fragment {
         this.ingredientsList = ingredientsList;
     }
 
+    @Override
+    public void onClick(StepsItem step) {
+
+    }
 }
