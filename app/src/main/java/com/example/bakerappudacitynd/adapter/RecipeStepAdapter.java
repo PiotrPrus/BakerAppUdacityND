@@ -37,6 +37,7 @@ public class RecipeStepAdapter extends RecyclerView.Adapter<RecipeStepAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        //TODO: RecyclerView is not display data
         final StepsItem step = stepsList.get(position);
         String stepShortDescription = step.getShortDescription();
         holder.shortDesc.setText(stepShortDescription);

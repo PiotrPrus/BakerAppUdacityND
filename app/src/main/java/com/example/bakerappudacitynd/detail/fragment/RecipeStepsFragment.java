@@ -48,26 +48,26 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
         if (stepsList != null) {
             stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             RecipeStepAdapter stepAdapter = new RecipeStepAdapter(stepsList, this);
+            stepsRecyclerView.setAdapter(stepAdapter);
         }
-
-
         return rootView;
     }
 
     private void initViews(View rootView) {
-
+        ingredientsView = (TextView) rootView.findViewById(R.id.detail_steps_ingredients);
+        stepsRecyclerView = (RecyclerView) rootView.findViewById(R.id.detail_steps_list);
     }
 
-    protected void setStepsList(List<StepsItem> stepsList){
+    public void setStepsList(List<StepsItem> stepsList){
         this.stepsList = stepsList;
     }
 
-    protected void setIngredientsList(List<IngredientsItem> ingredientsList){
+    public void setIngredientsList(List<IngredientsItem> ingredientsList){
         this.ingredientsList = ingredientsList;
     }
 
     @Override
     public void onClick(StepsItem step) {
-
+        //TODO: Go to StepActivity
     }
 }

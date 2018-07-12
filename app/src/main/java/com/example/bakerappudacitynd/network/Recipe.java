@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe implements Parcelable {
@@ -33,6 +34,10 @@ public class Recipe implements Parcelable {
         servings = in.readInt();
         name = in.readString();
         id = in.readInt();
+        ingredients = new ArrayList<>();
+        in.readTypedList(ingredients, IngredientsItem.CREATOR);
+        steps = new ArrayList<>();
+        in.readTypedList(steps, StepsItem.CREATOR);
     }
 
     public Recipe(String image, int servings, String name, List<IngredientsItem> ingredients,
@@ -129,5 +134,7 @@ public class Recipe implements Parcelable {
         parcel.writeInt(servings);
         parcel.writeString(name);
         parcel.writeInt(id);
+        parcel.writeTypedList(ingredients);
+        parcel.writeTypedList(steps);
     }
 }

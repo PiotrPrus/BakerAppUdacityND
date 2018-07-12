@@ -20,8 +20,8 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Recipe recipe = Objects.requireNonNull(getIntent().getExtras()).getParcelable(Recipe.KEY_RECIPE_DATA);
-        showRecipeDetail(recipe);
         initFragment();
+        showRecipeDetail(recipe);
     }
 
     private void initFragment() {
@@ -42,6 +42,8 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
 
     @Override
     public void showRecipeDetail(Recipe recipe) {
+        recipeStepsFragment.setIngredientsList(recipe.getIngredients());
+        recipeStepsFragment.setStepsList(recipe.getSteps());
         fragmentManager.beginTransaction().add(R.id.detail_container, recipeStepsFragment).commit();
     }
 }
