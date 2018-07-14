@@ -1,6 +1,7 @@
 package com.example.bakerappudacitynd.detail.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
 import com.example.bakerappudacitynd.network.IngredientsItem;
 import com.example.bakerappudacitynd.network.StepsItem;
+import com.example.bakerappudacitynd.step.RecipeStepActivity;
 
 import java.util.List;
 
@@ -47,8 +49,10 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
         }
         if (stepsList != null) {
             stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            RecipeStepAdapter stepAdapter = new RecipeStepAdapter(stepsList, this);
+            RecipeStepAdapter stepAdapter = new RecipeStepAdapter(this);
+            stepAdapter.setData(stepsList);
             stepsRecyclerView.setAdapter(stepAdapter);
+            stepAdapter.notifyDataSetChanged();
         }
         return rootView;
     }
@@ -68,6 +72,8 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
 
     @Override
     public void onClick(StepsItem step) {
-        //TODO: Go to StepActivity
+        Intent intent = new Intent(getActivity(), RecipeStepActivity.class);
+        intent.putExtra(StepsItem.KEY_STEP_DATA, step);
+        startActivity(intent);
     }
 }

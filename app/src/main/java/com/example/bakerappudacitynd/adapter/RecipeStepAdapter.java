@@ -19,8 +19,7 @@ public class RecipeStepAdapter extends RecyclerView.Adapter<RecipeStepAdapter.Vi
     private List<StepsItem> stepsList;
     private StepOnCLickListener stepOnCLickListener;
 
-    public RecipeStepAdapter(List<StepsItem> stepsList, StepOnCLickListener stepOnCLickListener) {
-        this.stepsList = stepsList;
+    public RecipeStepAdapter(StepOnCLickListener stepOnCLickListener) {
         this.stepOnCLickListener = stepOnCLickListener;
     }
 
@@ -28,11 +27,16 @@ public class RecipeStepAdapter extends RecyclerView.Adapter<RecipeStepAdapter.Vi
         void onClick(StepsItem step);
     }
 
+    public void setData(List<StepsItem> data) {
+        this.stepsList = data;
+    }
+
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.step_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.step_list_item, parent, false));
     }
 
     @Override
@@ -51,7 +55,7 @@ public class RecipeStepAdapter extends RecyclerView.Adapter<RecipeStepAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return 0;
+        return stepsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
