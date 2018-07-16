@@ -6,6 +6,12 @@
     android:orientation="vertical"
     tools:context=".detail.fragment.RecipeStepDetailFragment">
 
+    <TextView
+        android:id="@+id/step_detail_no_data_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="There is no data to display"/>
+
     <com.google.android.exoplayer2.ui.SimpleExoPlayerView
         android:id="@+id/step_detail_exo_player"
         android:layout_width="wrap_content"

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -36,6 +36,7 @@ public class RecipeStepDetailFragment extends Fragment {
     private static final String TAG = RecipeStepDetailFragment.class.getSimpleName();
     private static final String VIDEO_POSITION = "videoPosition";
     private static final String VIDEO_WINDOW = "videoWindow";
+    private static final String BUNDLE_STEP_ITEM_DATA = "bundle_step_item_data";
 
     private StepsItem stepsItem;
     private SimpleExoPlayer exoPlayer;
@@ -44,13 +45,23 @@ public class RecipeStepDetailFragment extends Fragment {
     private int currentWindow;
 
     private TextView stepDescriptionTextView;
+    private TextView stepDetailNoDataTextView;
 
-    public RecipeStepDetailFragment() {
-        // Required empty public constructor
+    public static RecipeStepDetailFragment newInstance(StepsItem stepsItem) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_STEP_ITEM_DATA, stepsItem);
+        RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
-    public void setStepItem(StepsItem stepsItem) {
-        this.stepsItem = stepsItem;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle arguments = getArguments();
+        if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))){
+            stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
+        }
     }
 
     @Override
@@ -61,9 +72,20 @@ public class RecipeStepDetailFragment extends Fragment {
         initViews(rootView);
 
         if (stepsItem != null) {
-            initMediaSession();
-            initPlayer(stepsItem.getVideoURL());
+            stepDetailNoDataTextView.setVisibility(View.GONE);
+            stepDescriptionTextView.setVisibility(View.VISIBLE);
             stepDescriptionTextView.setText(stepsItem.getDescription());
+            if (!TextUtils.isEmpty(stepsItem.getVideoURL())) {
+                exoPlayerView.setVisibility(View.VISIBLE);
+                initMediaSession();
+                initPlayer(stepsItem.getVideoURL());
+            } else {
+                exoPlayerView.setVisibility(View.GONE);
+            }
+        } else {
+            stepDetailNoDataTextView.setVisibility(View.VISIBLE);
+            exoPlayerView.setVisibility(View.GONE);
+            stepDescriptionTextView.setVisibility(View.GONE);
         }
         return rootView;
     }
@@ -83,7 +105,7 @@ public class RecipeStepDetailFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             stepsItem = savedInstanceState.getParcelable(StepsItem.KEY_STEP_DATA);
             videoPosition = savedInstanceState.getLong(VIDEO_POSITION);
             currentWindow = savedInstanceState.getInt(VIDEO_WINDOW);
@@ -110,7 +132,7 @@ public class RecipeStepDetailFragment extends Fragment {
         if (exoPlayer != null) {
             exoPlayer.release();
             currentWindow = exoPlayer.getCurrentWindowIndex();
-            videoPosition= exoPlayer.getCurrentPosition();
+            videoPosition = exoPlayer.getCurrentPosition();
             exoPlayer = null;
         }
     }
@@ -121,6 +143,34 @@ public class RecipeStepDetailFragment extends Fragment {
         releasePlayer();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (this.isVisible()) {
+            if (!isVisibleToUser) {
+                if (exoPlayer != null) {
+                    exoPlayer.setPlayWhenReady(false);
+                }
+            }
+        }
+    }
+
     private void initMediaSession() {
         MediaSessionCompat mediaSession = new MediaSessionCompat(getContext(), TAG);
         mediaSession.setActive(true);
@@ -129,5 +179,6 @@ public class RecipeStepDetailFragment extends Fragment {
     private void initViews(View rootView) {
         exoPlayerView = rootView.findViewById(R.id.step_detail_exo_player);
         stepDescriptionTextView = rootView.findViewById(R.id.step_detail_video_description);
+        stepDetailNoDataTextView = rootView.findViewById(R.id.step_detail_no_data_tv);
     }
 }

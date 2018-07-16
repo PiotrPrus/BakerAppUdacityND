@@ -2,6 +2,7 @@ package com.example.bakerappudacitynd.step;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.example.bakerappudacitynd.BaseMvpActivity;
@@ -11,7 +12,6 @@ import com.example.bakerappudacitynd.network.StepsItem;
 
 public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeStepPresenter> implements RecipeStepView {
 
-    private RecipeStepDetailFragment stepDetailFragment;
     private FragmentManager fragmentManager;
 
     @Override
@@ -23,7 +23,6 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
     }
 
     private void initFragment() {
-        stepDetailFragment = new RecipeStepDetailFragment();
         fragmentManager = getSupportFragmentManager();
     }
 
@@ -34,8 +33,8 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
 
     @Override
     public void displayRecipeStepDetail(StepsItem step) {
-        stepDetailFragment.setStepItem(step);
-        fragmentManager.beginTransaction().add(R.id.step_container, stepDetailFragment).commit();
+        Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(step);
+        fragmentManager.beginTransaction().add(R.id.step_container, recipeDetailFragment).commit();
     }
 
     @NonNull

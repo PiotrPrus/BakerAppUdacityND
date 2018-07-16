@@ -1,9 +1,13 @@
 package com.example.bakerappudacitynd.detail.fragment;
 
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
+import com.example.bakerappudacitynd.detail.SharedViewModel;
 import com.example.bakerappudacitynd.network.IngredientsItem;
 import com.example.bakerappudacitynd.network.StepsItem;
 import com.example.bakerappudacitynd.step.RecipeStepActivity;
@@ -24,6 +29,8 @@ import java.util.List;
  */
 public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.StepOnCLickListener{
 
+    private SharedViewModel model;
+
     private List<StepsItem> stepsList;
     private RecyclerView stepsRecyclerView;
     private TextView ingredientsView;
@@ -31,6 +38,12 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
 
     public RecipeStepsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        model = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
     }
 
     @Override
@@ -72,8 +85,9 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
 
     @Override
     public void onClick(StepsItem step) {
-        Intent intent = new Intent(getActivity(), RecipeStepActivity.class);
-        intent.putExtra(StepsItem.KEY_STEP_DATA, step);
-        startActivity(intent);
+//        Intent intent = new Intent(getActivity(), RecipeStepActivity.class);
+//        intent.putExtra(StepsItem.KEY_STEP_DATA, step);
+//        startActivity(intent);
+        model.select(step);
     }
 }
