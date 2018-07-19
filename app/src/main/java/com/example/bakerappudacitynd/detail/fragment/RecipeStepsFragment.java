@@ -55,6 +55,8 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
 
         if (ingredientsList != null) {
             StringBuilder builder = new StringBuilder();
+            builder.append("Ingredients: ");
+            builder.append("\n").append("\n");
             for (IngredientsItem item : ingredientsList){
                 builder.append(ingredientsList.indexOf(item) + 1).append(". ");
                 builder.append(item.getIngredient());

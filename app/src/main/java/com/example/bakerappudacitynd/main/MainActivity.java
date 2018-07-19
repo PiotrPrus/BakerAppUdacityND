@@ -16,6 +16,8 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeRecyclerAdapter;
 import com.example.bakerappudacitynd.detail.DetailActivity;
 import com.example.bakerappudacitynd.network.Recipe;
+import com.example.bakerappudacitynd.widget.RecipeWidget;
+import com.example.bakerappudacitynd.widget.RecipeWidgetService;
 
 import java.util.List;
 
@@ -80,8 +82,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onClick(Recipe recipe) {
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra(Recipe.KEY_RECIPE_DATA, recipe);
-        startActivity(intent);
+        RecipeWidgetService.startActionUpdateRecipeWidgets(this, recipe);
+        startActivity(DetailActivity.getIntent(this, recipe));
     }
 }

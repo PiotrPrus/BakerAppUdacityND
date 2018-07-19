@@ -1,7 +1,9 @@
 package com.example.bakerappudacitynd.detail;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
 import com.example.bakerappudacitynd.detail.fragment.RecipeStepDetailFragment;
 import com.example.bakerappudacitynd.detail.fragment.RecipeStepsFragment;
+import com.example.bakerappudacitynd.main.MainActivity;
 import com.example.bakerappudacitynd.network.Recipe;
 import com.example.bakerappudacitynd.network.StepsItem;
 import com.example.bakerappudacitynd.step.RecipeStepActivity;
@@ -24,16 +27,25 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
 
     public static final String KEY_STEPS_LIST = "key_steps_list";
     public static final String KEY_STEPS_ITEM_ID = "key_steps_item_id";
+    public static final String SHARED_PREFS = "baker_app_preferences";
+    public static final String RECIPE_NAME = "recipe_name";
     private RecipeStepsFragment recipeStepsFragment;
     private FragmentManager fragmentManager;
 
     private boolean isTablet = false;
+
+    public static Intent getIntent(Context context, Recipe recipe) {
+        Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra(Recipe.KEY_RECIPE_DATA, recipe);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Recipe recipe = Objects.requireNonNull(getIntent().getExtras()).getParcelable(Recipe.KEY_RECIPE_DATA);
         setTitle(recipe.getName());
+        saveRecipeToSharedPrefs(recipe);
         if (findViewById(R.id.steps_item_container) != null) {
             isTablet = true;
         }
@@ -50,6 +62,12 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
                 showStepDetailActivity(recipe.getSteps(), stepsItem.getId());
             }
         });
+    }
+
+    private void saveRecipeToSharedPrefs(Recipe recipe) {
+        SharedPreferences preferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor prefEditor = preferences.edit();
+        prefEditor.putString(RECIPE_NAME, recipe.getName()).apply();
     }
 
     private void showStepDetailActivity(List<StepsItem> stepsList, int stepId) {
