@@ -39,6 +39,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(R.string.app_name);
         ButterKnife.bind(this);
         initUI();
         presenter.loadData();

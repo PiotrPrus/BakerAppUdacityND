@@ -33,6 +33,7 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Recipe recipe = Objects.requireNonNull(getIntent().getExtras()).getParcelable(Recipe.KEY_RECIPE_DATA);
+        setTitle(recipe.getName());
         if (findViewById(R.id.steps_item_container) != null) {
             isTablet = true;
         }
