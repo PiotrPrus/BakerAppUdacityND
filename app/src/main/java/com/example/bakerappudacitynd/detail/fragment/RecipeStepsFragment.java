@@ -56,7 +56,9 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
         if (ingredientsList != null) {
             StringBuilder builder = new StringBuilder();
             for (IngredientsItem item : ingredientsList){
+                builder.append(ingredientsList.indexOf(item) + 1).append(". ");
                 builder.append(item.getIngredient());
+                builder.append("\n");
             }
             ingredientsView.setText(builder.toString());
         }
@@ -71,8 +73,8 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
     }
 
     private void initViews(View rootView) {
-        ingredientsView = (TextView) rootView.findViewById(R.id.detail_steps_ingredients);
-        stepsRecyclerView = (RecyclerView) rootView.findViewById(R.id.detail_steps_list);
+        ingredientsView = rootView.findViewById(R.id.detail_steps_ingredients);
+        stepsRecyclerView = rootView.findViewById(R.id.detail_steps_list);
     }
 
     public void setStepsList(List<StepsItem> stepsList){
