@@ -41,8 +41,10 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
         SharedViewModel model = ViewModelProviders.of(this).get(SharedViewModel.class);
         model.getSelected().observe(this, stepsItem -> {
             if (isTablet) {
-                Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(stepsItem, recipe.getSteps().size());
-                fragmentManager.beginTransaction().replace(R.id.steps_item_container, recipeDetailFragment).commit();
+                Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(stepsItem, (ArrayList<StepsItem>) recipe.getSteps());
+                fragmentManager.beginTransaction()
+                        .replace(R.id.steps_item_container, recipeDetailFragment)
+                        .commit();
             } else {
                 showStepDetailActivity(recipe.getSteps(), stepsItem.getId());
             }
@@ -62,7 +64,9 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
         recipeStepsFragment = new RecipeStepsFragment();
         if (isTablet) {
             RecipeStepDetailFragment recipeStepsDetailFragment = new RecipeStepDetailFragment();
-            fragmentManager.beginTransaction().replace(R.id.steps_item_container, recipeStepsDetailFragment).commit();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.steps_item_container, recipeStepsDetailFragment)
+                    .commit();
         }
     }
 
@@ -81,6 +85,8 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
     public void showRecipeDetail(Recipe recipe) {
         recipeStepsFragment.setIngredientsList(recipe.getIngredients());
         recipeStepsFragment.setStepsList(recipe.getSteps());
-        fragmentManager.beginTransaction().add(R.id.detail_container, recipeStepsFragment).commit();
+        fragmentManager.beginTransaction()
+                .replace(R.id.detail_container, recipeStepsFragment)
+                .commit();
     }
 }

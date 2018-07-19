@@ -20,11 +20,12 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
 
     private FragmentManager fragmentManager;
     private int itemsQuantity;
+    private ArrayList<StepsItem> stepsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ArrayList<StepsItem> stepsList = getIntent().getExtras().getParcelableArrayList(KEY_STEPS_LIST);
+        stepsList = getIntent().getExtras().getParcelableArrayList(KEY_STEPS_LIST);
         int stepId = getIntent().getExtras().getInt(KEY_STEPS_ITEM_ID, 0);
         initFragment();
         displayRecipeStepDetail(stepsList.get(stepId));
@@ -53,10 +54,9 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
 
     @Override
     public void displayRecipeStepDetail(StepsItem step) {
-        Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(step, itemsQuantity);
+        Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(step, stepsList);
         fragmentManager.beginTransaction()
                 .replace(R.id.step_container, recipeDetailFragment)
-                .addToBackStack(null)
                 .commit();
     }
 

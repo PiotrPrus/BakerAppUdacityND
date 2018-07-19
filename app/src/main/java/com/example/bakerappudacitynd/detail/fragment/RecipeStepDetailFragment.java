@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.bakerappudacitynd.R;
@@ -30,6 +32,8 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,13 +56,14 @@ public class RecipeStepDetailFragment extends Fragment {
     private TextView stepDescriptionTextView;
     private ImageView previousStepArrow;
     private ImageView nextStepArrow;
+    private ProgressBar detailStepProgressBar;
 
     private StepViewModel model;
 
-    public static RecipeStepDetailFragment newInstance(StepsItem stepsItem, int stepsQuantity) {
+    public static RecipeStepDetailFragment newInstance(StepsItem stepsItem, ArrayList<StepsItem> stepsList) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(BUNDLE_STEP_ITEM_DATA, stepsItem);
-        bundle.putInt(KEY_STEPS_ITEM_QUANTITY, stepsQuantity);
+        bundle.putInt(KEY_STEPS_ITEM_QUANTITY, stepsList.size());
         RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -82,20 +87,22 @@ public class RecipeStepDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         initViews(rootView);
         initArrowListeners();
+        detailStepProgressBar.setVisibility(View.VISIBLE);
 
         if (stepsItem != null) {
-            stepDescriptionTextView.setVisibility(View.VISIBLE);
             stepDescriptionTextView.setText(stepsItem.getDescription());
             if (!TextUtils.isEmpty(stepsItem.getVideoURL())) {
-                exoPlayerView.setVisibility(View.VISIBLE);
                 initMediaSession();
                 initPlayer(stepsItem.getVideoURL());
+                detailStepProgressBar.setVisibility(View.GONE);
+                stepDescriptionTextView.setVisibility(View.VISIBLE);
+                exoPlayerView.setVisibility(View.VISIBLE);
             } else {
                 exoPlayerView.setVisibility(View.GONE);
             }
         } else {
-            exoPlayerView.setVisibility(View.GONE);
             stepDescriptionTextView.setVisibility(View.GONE);
+            exoPlayerView.setVisibility(View.GONE);
         }
         return rootView;
     }
@@ -192,6 +199,7 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     private void initViews(View rootView) {
+        detailStepProgressBar = rootView.findViewById(R.id.step_detail_progress_bar);
         exoPlayerView = rootView.findViewById(R.id.step_detail_exo_player);
         stepDescriptionTextView = rootView.findViewById(R.id.step_detail_video_description);
         previousStepArrow = rootView.findViewById(R.id.step_detail_arrow_left);
