@@ -85,9 +85,6 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
 
     @Override
     public void onClick(StepsItem step) {
-//        Intent intent = new Intent(getActivity(), RecipeStepActivity.class);
-//        intent.putExtra(StepsItem.KEY_STEP_DATA, step);
-//        startActivity(intent);
         model.select(step);
     }
 }

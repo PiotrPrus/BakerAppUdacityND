@@ -16,12 +16,15 @@ import com.example.bakerappudacitynd.network.Recipe;
 import com.example.bakerappudacitynd.network.StepsItem;
 import com.example.bakerappudacitynd.step.RecipeStepActivity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter> implements DetailView {
 
+    public static final String KEY_STEPS_LIST = "key_steps_list";
+    public static final String KEY_STEPS_ITEM_ID = "key_steps_item_id";
     private RecipeStepsFragment recipeStepsFragment;
-    private RecipeStepDetailFragment recipeStepsDetailFragment;
     private FragmentManager fragmentManager;
 
     private boolean isTablet = false;
@@ -38,21 +41,27 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
         SharedViewModel model = ViewModelProviders.of(this).get(SharedViewModel.class);
         model.getSelected().observe(this, stepsItem -> {
             if (isTablet) {
-                Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(stepsItem);
+                Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(stepsItem, recipe.getSteps().size());
                 fragmentManager.beginTransaction().replace(R.id.steps_item_container, recipeDetailFragment).commit();
             } else {
-                Intent intent = new Intent(this, RecipeStepActivity.class);
-                intent.putExtra(StepsItem.KEY_STEP_DATA, stepsItem);
-                startActivity(intent);
+                showStepDetailActivity(recipe.getSteps(), stepsItem.getId());
             }
         });
+    }
+
+    private void showStepDetailActivity(List<StepsItem> stepsList, int stepId) {
+        Intent intent = new Intent(this, RecipeStepActivity.class);
+        ArrayList<StepsItem> parcelableList = new ArrayList<>(stepsList);
+        intent.putParcelableArrayListExtra(KEY_STEPS_LIST, parcelableList);
+        intent.putExtra(KEY_STEPS_ITEM_ID, stepId);
+        startActivity(intent);
     }
 
     private void initFragment() {
         fragmentManager = getSupportFragmentManager();
         recipeStepsFragment = new RecipeStepsFragment();
         if (isTablet) {
-            recipeStepsDetailFragment = new RecipeStepDetailFragment();
+            RecipeStepDetailFragment recipeStepsDetailFragment = new RecipeStepDetailFragment();
             fragmentManager.beginTransaction().replace(R.id.steps_item_container, recipeStepsDetailFragment).commit();
         }
     }

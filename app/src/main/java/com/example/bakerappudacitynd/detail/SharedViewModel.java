@@ -9,6 +9,7 @@ import com.example.bakerappudacitynd.network.StepsItem;
 public class SharedViewModel extends ViewModel {
     private final MutableLiveData<StepsItem> selected = new MutableLiveData<>();
 
+
     public void select(StepsItem item) {
         selected.setValue(item);
     }

@@ -1,6 +1,7 @@
 package com.example.bakerappudacitynd.detail.fragment;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,10 +12,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.network.StepsItem;
+import com.example.bakerappudacitynd.step.StepViewModel;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -37,19 +40,25 @@ public class RecipeStepDetailFragment extends Fragment {
     private static final String VIDEO_POSITION = "videoPosition";
     private static final String VIDEO_WINDOW = "videoWindow";
     private static final String BUNDLE_STEP_ITEM_DATA = "bundle_step_item_data";
+    private static final String KEY_STEPS_ITEM_QUANTITY = "key_steps_item_quantity";
 
     private StepsItem stepsItem;
+    private int stepsQuantity;
     private SimpleExoPlayer exoPlayer;
     private SimpleExoPlayerView exoPlayerView;
     private Long videoPosition;
     private int currentWindow;
 
     private TextView stepDescriptionTextView;
-    private TextView stepDetailNoDataTextView;
+    private ImageView previousStepArrow;
+    private ImageView nextStepArrow;
 
-    public static RecipeStepDetailFragment newInstance(StepsItem stepsItem) {
+    private StepViewModel model;
+
+    public static RecipeStepDetailFragment newInstance(StepsItem stepsItem, int stepsQuantity) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(BUNDLE_STEP_ITEM_DATA, stepsItem);
+        bundle.putInt(KEY_STEPS_ITEM_QUANTITY, stepsQuantity);
         RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -58,9 +67,11 @@ public class RecipeStepDetailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        model = ViewModelProviders.of(getActivity()).get(StepViewModel.class);
         Bundle arguments = getArguments();
-        if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))){
+        if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))) {
             stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
+            stepsQuantity = arguments.getInt(KEY_STEPS_ITEM_QUANTITY);
         }
     }
 
@@ -70,9 +81,9 @@ public class RecipeStepDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
         initViews(rootView);
+        initArrowListeners();
 
         if (stepsItem != null) {
-            stepDetailNoDataTextView.setVisibility(View.GONE);
             stepDescriptionTextView.setVisibility(View.VISIBLE);
             stepDescriptionTextView.setText(stepsItem.getDescription());
             if (!TextUtils.isEmpty(stepsItem.getVideoURL())) {
@@ -83,11 +94,15 @@ public class RecipeStepDetailFragment extends Fragment {
                 exoPlayerView.setVisibility(View.GONE);
             }
         } else {
-            stepDetailNoDataTextView.setVisibility(View.VISIBLE);
             exoPlayerView.setVisibility(View.GONE);
             stepDescriptionTextView.setVisibility(View.GONE);
         }
         return rootView;
+    }
+
+    private void initArrowListeners() {
+        previousStepArrow.setOnClickListener(view -> model.selectPrevious(stepsItem));
+        nextStepArrow.setOnClickListener(view -> model.selectNext(stepsItem));
     }
 
     @Override
@@ -179,6 +194,12 @@ public class RecipeStepDetailFragment extends Fragment {
     private void initViews(View rootView) {
         exoPlayerView = rootView.findViewById(R.id.step_detail_exo_player);
         stepDescriptionTextView = rootView.findViewById(R.id.step_detail_video_description);
-        stepDetailNoDataTextView = rootView.findViewById(R.id.step_detail_no_data_tv);
+        previousStepArrow = rootView.findViewById(R.id.step_detail_arrow_left);
+        nextStepArrow = rootView.findViewById(R.id.step_detail_arrow_rigt);
+        if (stepsItem.getId() == 0) {
+            previousStepArrow.setVisibility(View.GONE);
+        } else if (stepsItem.getId() == (stepsQuantity - 1)) {
+            nextStepArrow.setVisibility(View.GONE);
+        }
     }
 }

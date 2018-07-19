@@ -1,5 +1,6 @@
 package com.example.bakerappudacitynd.step;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,16 +11,35 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.detail.fragment.RecipeStepDetailFragment;
 import com.example.bakerappudacitynd.network.StepsItem;
 
+import java.util.ArrayList;
+
+import static com.example.bakerappudacitynd.detail.DetailActivity.KEY_STEPS_ITEM_ID;
+import static com.example.bakerappudacitynd.detail.DetailActivity.KEY_STEPS_LIST;
+
 public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeStepPresenter> implements RecipeStepView {
 
     private FragmentManager fragmentManager;
+    private int itemsQuantity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StepsItem stepsItem = getIntent().getExtras().getParcelable(StepsItem.KEY_STEP_DATA);
+        ArrayList<StepsItem> stepsList = getIntent().getExtras().getParcelableArrayList(KEY_STEPS_LIST);
+        int stepId = getIntent().getExtras().getInt(KEY_STEPS_ITEM_ID, 0);
         initFragment();
-        displayRecipeStepDetail(stepsItem);
+        displayRecipeStepDetail(stepsList.get(stepId));
+        itemsQuantity = stepsList.size();
+        StepViewModel model = ViewModelProviders.of(this).get(StepViewModel.class);
+        model.getPreviousSelected().observe(this, item -> {
+            int currentId = item.getId();
+            displayRecipeStepDetail(stepsList.get(currentId - 1));
+        });
+        model.getNextSelected().observe(this, item -> {
+            int currentId = item.getId();
+            if (currentId != itemsQuantity) {
+                displayRecipeStepDetail(stepsList.get(currentId + 1));
+            }
+        });
     }
 
     private void initFragment() {
@@ -33,8 +53,11 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
 
     @Override
     public void displayRecipeStepDetail(StepsItem step) {
-        Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(step);
-        fragmentManager.beginTransaction().add(R.id.step_container, recipeDetailFragment).commit();
+        Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(step, itemsQuantity);
+        fragmentManager.beginTransaction()
+                .replace(R.id.step_container, recipeDetailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @NonNull
