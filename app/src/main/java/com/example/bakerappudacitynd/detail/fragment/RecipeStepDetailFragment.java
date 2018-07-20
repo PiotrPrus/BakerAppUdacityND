@@ -84,11 +84,6 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(StepViewModel.class);
-        Bundle arguments = getArguments();
-        if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))) {
-            stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
-            stepsList = arguments.getParcelableArrayList(KEY_STEPS_LIST);
-        }
     }
 
     @Override
@@ -99,6 +94,11 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         if (savedInstanceState != null) {
             playbackPosition = savedInstanceState.getLong(PLAYER_POSITION);
             playbackReady = savedInstanceState.getBoolean(PLAYBACK_READY);
+        }
+        Bundle arguments = getArguments();
+        if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))) {
+            stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
+            stepsList = arguments.getParcelableArrayList(KEY_STEPS_LIST);
         }
         initViews(rootView);
         initArrowListeners();
@@ -227,10 +227,13 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         stepDescriptionTextView = rootView.findViewById(R.id.step_detail_video_description);
         previousStepArrow = rootView.findViewById(R.id.step_detail_arrow_left);
         nextStepArrow = rootView.findViewById(R.id.step_detail_arrow_rigt);
-        if (stepsItem.getId() == 0) {
-            previousStepArrow.setVisibility(View.GONE);
-        } else if (stepsItem.getId() == (stepsList.size() - 1)) {
-            nextStepArrow.setVisibility(View.GONE);
+
+        if (stepsItem != null) {
+            if (stepsItem.getId() == 0) {
+                previousStepArrow.setVisibility(View.GONE);
+            } else if (stepsItem.getId() == (stepsList.size() - 1)) {
+                nextStepArrow.setVisibility(View.GONE);
+            }
         }
     }
 
