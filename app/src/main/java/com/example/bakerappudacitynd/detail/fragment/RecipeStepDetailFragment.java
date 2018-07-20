@@ -39,6 +39,8 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
+import okhttp3.internal.Util;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -83,10 +85,6 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(StepViewModel.class);
         Bundle arguments = getArguments();
-        if (savedInstanceState != null) {
-            playbackPosition = savedInstanceState.getLong(PLAYER_POSITION);
-            playbackReady = savedInstanceState.getBoolean(PLAYBACK_READY);
-        }
         if ((arguments != null) && (arguments.containsKey(BUNDLE_STEP_ITEM_DATA))) {
             stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
             stepsList = arguments.getParcelableArrayList(KEY_STEPS_LIST);
@@ -98,6 +96,10 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail, container, false);
+        if (savedInstanceState != null) {
+            playbackPosition = savedInstanceState.getLong(PLAYER_POSITION);
+            playbackReady = savedInstanceState.getBoolean(PLAYBACK_READY);
+        }
         initViews(rootView);
         initArrowListeners();
 
@@ -105,7 +107,6 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             stepDescriptionTextView.setText(stepsItem.getDescription());
             if (!TextUtils.isEmpty(stepsItem.getVideoURL())) {
                 initMediaSession();
-                initPlayer(stepsItem.getVideoURL());
                 stepDescriptionTextView.setVisibility(View.VISIBLE);
                 exoPlayerView.setVisibility(View.VISIBLE);
             } else {
@@ -116,6 +117,24 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             exoPlayerView.setVisibility(View.GONE);
         }
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            if (!getUserVisibleHint()) return;
+            initPlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Util.SDK_INT > 23 || exoPlayer == null) {
+            if (!getUserVisibleHint()) return;
+            initPlayer();
+        }
     }
 
     private void initArrowListeners() {
@@ -145,15 +164,14 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         }
     }
 
-    private void initPlayer(String videoURL) {
-        Uri uri = Uri.parse(videoURL);
+    private void initPlayer() {
         if (exoPlayer == null) {
             TrackSelector selector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), selector, loadControl);
             exoPlayerView.setPlayer(exoPlayer);
             String userAgent = Util.getUserAgent(getContext(), "RecipeStepVideo");
-            MediaSource mediaSource = new ExtractorMediaSource(uri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(stepsItem.getVideoURL()), new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(playbackReady);
             exoPlayer.seekTo(currentWindow, playbackPosition);
@@ -171,25 +189,9 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
-        if (Util.SDK_INT <= 23) {
             releasePlayer();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (Util.SDK_INT <= 23) {
-            releasePlayer();
-        }
     }
 
     @Override
