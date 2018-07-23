@@ -1,6 +1,5 @@
 package com.example.bakerappudacitynd.detail.fragment;
 
-
 import android.arch.lifecycle.ViewModelProviders;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,7 +38,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
-import okhttp3.internal.Util;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,6 +69,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
 
     private StepViewModel model;
     private MediaSessionCompat mediaSession;
+    private boolean isTablet = false;
 
     public static RecipeStepDetailFragment newInstance(StepsItem stepsItem, ArrayList<StepsItem> stepsList) {
         Bundle bundle = new Bundle();
@@ -100,6 +100,8 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             stepsItem = arguments.getParcelable(BUNDLE_STEP_ITEM_DATA);
             stepsList = arguments.getParcelableArrayList(KEY_STEPS_LIST);
         }
+        isTablet = getResources().getBoolean(R.bool.isTablet);
+
         initViews(rootView);
         initArrowListeners();
 
@@ -171,7 +173,10 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
             exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), selector, loadControl);
             exoPlayerView.setPlayer(exoPlayer);
             String userAgent = Util.getUserAgent(getContext(), "RecipeStepVideo");
-            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(stepsItem.getVideoURL()), new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            MediaSource mediaSource = null;
+            if (stepsItem != null) {
+                mediaSource = new ExtractorMediaSource(Uri.parse(stepsItem.getVideoURL()), new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            }
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(playbackReady);
             exoPlayer.seekTo(currentWindow, playbackPosition);
@@ -191,7 +196,7 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
     @Override
     public void onPause() {
         super.onPause();
-            releasePlayer();
+        releasePlayer();
     }
 
     @Override
@@ -227,6 +232,13 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         stepDescriptionTextView = rootView.findViewById(R.id.step_detail_video_description);
         previousStepArrow = rootView.findViewById(R.id.step_detail_arrow_left);
         nextStepArrow = rootView.findViewById(R.id.step_detail_arrow_rigt);
+
+        Boolean isPortrait = this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
+
+        if (isTablet && !isPortrait) {
+            previousStepArrow.setVisibility(View.GONE);
+            nextStepArrow.setVisibility(View.GONE);
+        }
 
         if (stepsItem != null) {
             if (stepsItem.getId() == 0) {

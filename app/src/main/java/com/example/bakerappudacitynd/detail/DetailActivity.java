@@ -1,9 +1,11 @@
 package com.example.bakerappudacitynd.detail;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,10 +13,8 @@ import android.support.v4.app.FragmentManager;
 
 import com.example.bakerappudacitynd.BaseMvpActivity;
 import com.example.bakerappudacitynd.R;
-import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
 import com.example.bakerappudacitynd.detail.fragment.RecipeStepDetailFragment;
 import com.example.bakerappudacitynd.detail.fragment.RecipeStepsFragment;
-import com.example.bakerappudacitynd.main.MainActivity;
 import com.example.bakerappudacitynd.network.Recipe;
 import com.example.bakerappudacitynd.network.StepsItem;
 import com.example.bakerappudacitynd.step.RecipeStepActivity;
@@ -22,6 +22,8 @@ import com.example.bakerappudacitynd.step.RecipeStepActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter> implements DetailView {
 
@@ -33,6 +35,7 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
     private FragmentManager fragmentManager;
 
     private boolean isTablet = false;
+    private boolean isPortrait = false;
 
     public static Intent getIntent(Context context, Recipe recipe) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -46,14 +49,14 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
         Recipe recipe = Objects.requireNonNull(getIntent().getExtras()).getParcelable(Recipe.KEY_RECIPE_DATA);
         setTitle(recipe.getName());
         saveRecipeToSharedPrefs(recipe);
-        if (findViewById(R.id.steps_item_container) != null) {
-            isTablet = true;
-        }
+        isTablet = getResources().getBoolean(R.bool.isTablet);
+        isPortrait = this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
+
         initFragment();
         showRecipeDetail(recipe);
         SharedViewModel model = ViewModelProviders.of(this).get(SharedViewModel.class);
         model.getSelected().observe(this, stepsItem -> {
-            if (isTablet) {
+            if (isTablet && !isPortrait) {
                 Fragment recipeDetailFragment = RecipeStepDetailFragment.newInstance(stepsItem, (ArrayList<StepsItem>) recipe.getSteps());
                 fragmentManager.beginTransaction()
                         .replace(R.id.steps_item_container, recipeDetailFragment)
@@ -81,7 +84,8 @@ public class DetailActivity extends BaseMvpActivity<DetailView, DetailPresenter>
     private void initFragment() {
         fragmentManager = getSupportFragmentManager();
         recipeStepsFragment = new RecipeStepsFragment();
-        if (isTablet) {
+
+        if (isTablet && !isPortrait) {
             RecipeStepDetailFragment recipeStepsDetailFragment = new RecipeStepDetailFragment();
             fragmentManager.beginTransaction()
                     .replace(R.id.steps_item_container, recipeStepsDetailFragment)

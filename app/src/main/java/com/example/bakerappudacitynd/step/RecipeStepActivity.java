@@ -28,7 +28,9 @@ public class RecipeStepActivity extends BaseMvpActivity<RecipeStepView, RecipeSt
         stepsList = getIntent().getExtras().getParcelableArrayList(KEY_STEPS_LIST);
         int stepId = getIntent().getExtras().getInt(KEY_STEPS_ITEM_ID, 0);
         initFragment();
-        displayRecipeStepDetail(stepsList.get(stepId));
+        if (savedInstanceState == null) {
+            displayRecipeStepDetail(stepsList.get(stepId));
+        }
         itemsQuantity = stepsList.size();
         StepViewModel model = ViewModelProviders.of(this).get(StepViewModel.class);
         model.getPreviousSelected().observe(this, item -> {
