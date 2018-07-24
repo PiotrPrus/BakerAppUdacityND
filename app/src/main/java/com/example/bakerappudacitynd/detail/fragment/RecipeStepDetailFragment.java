@@ -121,6 +121,15 @@ public class RecipeStepDetailFragment extends Fragment implements ExoPlayer.Even
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            if (!getUserVisibleHint()) return;
+            initPlayer();
+        }
+    }
+
     private void initArrowListeners() {
         previousStepArrow.setOnClickListener(view -> model.selectPrevious(stepsItem));
         nextStepArrow.setOnClickListener(view -> model.selectNext(stepsItem));
