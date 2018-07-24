@@ -1,10 +1,7 @@
 package com.example.bakerappudacitynd.main;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -16,7 +13,6 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeRecyclerAdapter;
 import com.example.bakerappudacitynd.detail.DetailActivity;
 import com.example.bakerappudacitynd.network.Recipe;
-import com.example.bakerappudacitynd.widget.RecipeWidget;
 import com.example.bakerappudacitynd.widget.RecipeWidgetService;
 
 import java.util.List;

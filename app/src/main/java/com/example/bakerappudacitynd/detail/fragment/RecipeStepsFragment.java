@@ -1,13 +1,10 @@
 package com.example.bakerappudacitynd.detail.fragment;
 
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,16 +16,17 @@ import com.example.bakerappudacitynd.R;
 import com.example.bakerappudacitynd.adapter.RecipeStepAdapter;
 import com.example.bakerappudacitynd.detail.SharedViewModel;
 import com.example.bakerappudacitynd.network.IngredientsItem;
+import com.example.bakerappudacitynd.network.Recipe;
 import com.example.bakerappudacitynd.network.StepsItem;
-import com.example.bakerappudacitynd.step.RecipeStepActivity;
 
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.StepOnCLickListener{
+public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.StepOnCLickListener {
 
+    private static final String BUNDLE_DATA_RECIPE = "BUNDLE_DATA_RECIPE";
     private SharedViewModel model;
 
     private List<StepsItem> stepsList;
@@ -40,10 +38,26 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
         // Required empty public constructor
     }
 
+    public static RecipeStepsFragment newInstance(Recipe recipe) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_DATA_RECIPE, recipe);
+        RecipeStepsFragment fragment = new RecipeStepsFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        Bundle arguments = getArguments();
+
+        if (arguments != null) {
+            Recipe recipe = arguments.getParcelable(BUNDLE_DATA_RECIPE);
+            stepsList = recipe.getSteps();
+            ingredientsList = recipe.getIngredients();
+        }
     }
 
     @Override
@@ -57,7 +71,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
             StringBuilder builder = new StringBuilder();
             builder.append("Ingredients: ");
             builder.append("\n").append("\n");
-            for (IngredientsItem item : ingredientsList){
+            for (IngredientsItem item : ingredientsList) {
                 builder.append(ingredientsList.indexOf(item) + 1).append(". ");
                 builder.append(item.getIngredient());
                 builder.append("\n");
@@ -77,14 +91,6 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepAdapter.S
     private void initViews(View rootView) {
         ingredientsView = rootView.findViewById(R.id.detail_steps_ingredients);
         stepsRecyclerView = rootView.findViewById(R.id.detail_steps_list);
-    }
-
-    public void setStepsList(List<StepsItem> stepsList){
-        this.stepsList = stepsList;
-    }
-
-    public void setIngredientsList(List<IngredientsItem> ingredientsList){
-        this.ingredientsList = ingredientsList;
     }
 
     @Override
